@@ -1,0 +1,93 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id    String  @id @default(uuid()) @db.Uuid
+  email String  @unique
+  name  String?
+  image String?
+
+  active    Boolean   @default(true)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  games Game[]
+
+  @@index(fields: [active])
+}
+
+model Mission {
+  id          Int    @id @default(autoincrement())
+  title       String
+  description String
+  type        String
+  level       Int
+
+  active    Boolean   @default(true)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  bugs  Bug[]
+  games Game[]
+
+  @@unique([type, level])
+  @@index(fields: [active])
+}
+
+model Bug {
+  id          Int     @id @default(autoincrement())
+  name        String
+  description String
+  realBug     Boolean
+
+  missionId Int
+  mission   Mission @relation(fields: [missionId], references: [id])
+
+  active    Boolean   @default(true)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  bugOnGames BugOnGame[]
+
+  @@index(fields: [active])
+}
+
+model Game {
+  id         Int       @id @default(autoincrement())
+  score      Int
+  startedAt  DateTime?
+  finishedAt DateTime?
+  finished   Boolean
+
+  missionId Int
+  mission   Mission @relation(fields: [missionId], references: [id])
+  userId    String  @db.Uuid
+  user      User    @relation(fields: [userId], references: [id])
+
+  active    Boolean   @default(true)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  bugOnGames BugOnGame[]
+
+  @@index(fields: [active])
+}
+
+model BugOnGame {
+  gameId Int
+  game   Game @relation(fields: [gameId], references: [id])
+  bugId  Int
+  bug    Bug  @relation(fields: [bugId], references: [id])
+
+  @@id([gameId, bugId])
+}
