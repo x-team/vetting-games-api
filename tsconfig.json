@@ -2,16 +2,16 @@
   "compilerOptions": {
     "rootDirs": ["src"],
     "outDir": "dist",
-    "lib": ["ES2020", "ESNext"],
-    "target": "ESNext",
-    "module": "ESNext",
-    "moduleResolution": "NodeNext",
+    "lib": ["ES2021"],
+    "target": "ES2021",
+    "module": "CommonJS",
+    "moduleResolution": "Node",
     "esModuleInterop": true,
     "strict": true,
     "types": ["node"],
-    "baseUrl": ".",
+    "baseUrl": "src",
     "paths": {
-      "@*": ["src/*"]
+      "@*": ["*"]
     }
   },
   "include": ["src/**/*"],
