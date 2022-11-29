@@ -1,0 +1,14 @@
+FROM node:18
+
+WORKDIR /app
+
+COPY package.json ./
+RUN yarn install
+
+COPY . .
+
+RUN yarn db:generate
+
+EXPOSE 4000
+
+CMD ["yarn", "dev"]

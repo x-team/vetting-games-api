@@ -1,0 +1,29 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+  server:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    depends_on:
+      - db
+    volumes:
+      - './src:/app/src'
+      - './package.json:/app/package.json'
+      - './yarn.lock:/app/yarn.lock'
+    ports:
+      - "4000:4000"
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@db:5432/postgres
+volumes:
+  db_data:
