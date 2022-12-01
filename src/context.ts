@@ -18,13 +18,16 @@ export const context: ContextFunction<
 > = async ({ req }) => {
   const accessToken = req.headers.authorization?.replace("Bearer ", "");
 
-  const userToken = accessToken ? verifyUserToken(accessToken) : null;
-  const user = userToken
-    ? await prisma.user.findUnique({ where: { id: userToken?.id } })
-    : null;
+  try {
+    const userToken = accessToken ? verifyUserToken(accessToken) : null;
+    const user = userToken
+      ? await prisma.user.findUnique({ where: { id: userToken?.id } })
+      : null;
 
-  return {
-    prisma,
-    user: user?.active ? user : null,
-  };
+    if (!user?.active) return { prisma };
+
+    return { prisma, user };
+  } catch (error) {
+    return { prisma };
+  }
 };

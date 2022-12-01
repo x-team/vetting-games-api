@@ -1,4 +1,8 @@
-import { GraphQLResolveInfo } from "graphql";
+import {
+  GraphQLResolveInfo,
+  GraphQLScalarType,
+  GraphQLScalarTypeConfig,
+} from "graphql";
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = {
@@ -20,6 +24,16 @@ export type Scalars = {
   Boolean: boolean;
   Int: number;
   Float: number;
+  Date: any;
+};
+
+export type Game = {
+  __typename?: "Game";
+  finishedAt?: Maybe<Scalars["Date"]>;
+  id: Scalars["Int"];
+  mission?: Maybe<Mission>;
+  score?: Maybe<Scalars["Int"]>;
+  startedAt: Scalars["Date"];
 };
 
 export type Mission = {
@@ -27,6 +41,7 @@ export type Mission = {
   description: Scalars["String"];
   id: Scalars["Int"];
   level: Scalars["Int"];
+  releaseDate?: Maybe<Scalars["Date"]>;
   title: Scalars["String"];
   type: Scalars["String"];
 };
@@ -35,6 +50,7 @@ export type Mutation = {
   __typename?: "Mutation";
   health: Scalars["String"];
   loginWithGitHub: TokenResponse;
+  startGame: Game;
 };
 
 export type MutationLoginWithGitHubArgs = {
@@ -42,12 +58,18 @@ export type MutationLoginWithGitHubArgs = {
   redirectUrl?: InputMaybe<Scalars["String"]>;
 };
 
+export type MutationStartGameArgs = {
+  missionId: Scalars["Int"];
+};
+
 export type Query = {
   __typename?: "Query";
+  game?: Maybe<Game>;
   health: Scalars["String"];
   mission?: Maybe<Mission>;
   missionByTypeLevel?: Maybe<Mission>;
   missions: Array<Mission>;
+  missionsByType: Array<Mission>;
 };
 
 export type QueryMissionArgs = {
@@ -56,6 +78,10 @@ export type QueryMissionArgs = {
 
 export type QueryMissionByTypeLevelArgs = {
   level: Scalars["Int"];
+  type: Scalars["String"];
+};
+
+export type QueryMissionsByTypeArgs = {
   type: Scalars["String"];
 };
 
@@ -172,6 +198,8 @@ export type DirectiveResolverFn<
 /** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = {
   Boolean: ResolverTypeWrapper<Scalars["Boolean"]>;
+  Date: ResolverTypeWrapper<Scalars["Date"]>;
+  Game: ResolverTypeWrapper<Game>;
   Int: ResolverTypeWrapper<Scalars["Int"]>;
   Mission: ResolverTypeWrapper<Mission>;
   Mutation: ResolverTypeWrapper<{}>;
@@ -183,12 +211,31 @@ export type ResolversTypes = {
 /** Mapping between all available schema types and the resolvers parents */
 export type ResolversParentTypes = {
   Boolean: Scalars["Boolean"];
+  Date: Scalars["Date"];
+  Game: Game;
   Int: Scalars["Int"];
   Mission: Mission;
   Mutation: {};
   Query: {};
   String: Scalars["String"];
   TokenResponse: TokenResponse;
+};
+
+export interface DateScalarConfig
+  extends GraphQLScalarTypeConfig<ResolversTypes["Date"], any> {
+  name: "Date";
+}
+
+export type GameResolvers<
+  ContextType = any,
+  ParentType extends ResolversParentTypes["Game"] = ResolversParentTypes["Game"]
+> = {
+  finishedAt?: Resolver<Maybe<ResolversTypes["Date"]>, ParentType, ContextType>;
+  id?: Resolver<ResolversTypes["Int"], ParentType, ContextType>;
+  mission?: Resolver<Maybe<ResolversTypes["Mission"]>, ParentType, ContextType>;
+  score?: Resolver<Maybe<ResolversTypes["Int"]>, ParentType, ContextType>;
+  startedAt?: Resolver<ResolversTypes["Date"], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type MissionResolvers<
@@ -198,6 +245,11 @@ export type MissionResolvers<
   description?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
   id?: Resolver<ResolversTypes["Int"], ParentType, ContextType>;
   level?: Resolver<ResolversTypes["Int"], ParentType, ContextType>;
+  releaseDate?: Resolver<
+    Maybe<ResolversTypes["Date"]>,
+    ParentType,
+    ContextType
+  >;
   title?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
   type?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
@@ -214,12 +266,19 @@ export type MutationResolvers<
     ContextType,
     RequireFields<MutationLoginWithGitHubArgs, "code">
   >;
+  startGame?: Resolver<
+    ResolversTypes["Game"],
+    ParentType,
+    ContextType,
+    RequireFields<MutationStartGameArgs, "missionId">
+  >;
 };
 
 export type QueryResolvers<
   ContextType = any,
   ParentType extends ResolversParentTypes["Query"] = ResolversParentTypes["Query"]
 > = {
+  game?: Resolver<Maybe<ResolversTypes["Game"]>, ParentType, ContextType>;
   health?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
   mission?: Resolver<
     Maybe<ResolversTypes["Mission"]>,
@@ -238,6 +297,12 @@ export type QueryResolvers<
     ParentType,
     ContextType
   >;
+  missionsByType?: Resolver<
+    Array<ResolversTypes["Mission"]>,
+    ParentType,
+    ContextType,
+    RequireFields<QueryMissionsByTypeArgs, "type">
+  >;
 };
 
 export type TokenResponseResolvers<
@@ -249,6 +314,8 @@ export type TokenResponseResolvers<
 };
 
 export type Resolvers<ContextType = any> = {
+  Date?: GraphQLScalarType;
+  Game?: GameResolvers<ContextType>;
   Mission?: MissionResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;

@@ -2,6 +2,8 @@ import { Context } from "@context";
 import { Resolvers } from "@gql";
 import { missionResolver, missionSchema } from "./mission";
 import { authResolver, authSchema } from "./auth";
+import { gameResolver, gameSchema } from "./game";
+import { dateResolver, dateSchema } from "./date";
 
 const baseSchema = `#graphql
   type Query {
@@ -28,5 +30,17 @@ const baseResolver: Resolvers<Context> = {
   },
 };
 
-export const typeDefs = [baseSchema, authSchema, missionSchema];
-export const resolvers = [baseResolver, authResolver, missionResolver];
+export const typeDefs = [
+  baseSchema,
+  dateSchema,
+  authSchema,
+  missionSchema,
+  gameSchema,
+];
+export const resolvers = [
+  baseResolver,
+  dateResolver,
+  authResolver,
+  missionResolver,
+  gameResolver,
+];

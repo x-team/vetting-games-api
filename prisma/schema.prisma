@@ -45,11 +45,12 @@ model SocialLogin {
 }
 
 model Mission {
-  id          Int    @id @default(autoincrement())
+  id          Int       @id @default(autoincrement())
   title       String
   description String
   type        String
   level       Int
+  releaseDate DateTime?
 
   active    Boolean   @default(true)
   createdAt DateTime  @default(now())
@@ -61,6 +62,7 @@ model Mission {
 
   @@unique([type, level])
   @@index(fields: [active])
+  @@index(fields: [active, type])
 }
 
 model Bug {
@@ -84,10 +86,9 @@ model Bug {
 
 model Game {
   id         Int       @id @default(autoincrement())
-  score      Int
-  startedAt  DateTime?
+  score      Int?
+  startedAt  DateTime  @default(now())
   finishedAt DateTime?
-  finished   Boolean
 
   missionId Int
   mission   Mission @relation(fields: [missionId], references: [id], onDelete: Cascade)
