@@ -5,8 +5,8 @@ module.exports = {
     node: true,
   },
   extends: ["eslint:recommended", "plugin:@typescript-eslint/recommended"],
-  exclude: ["node_modules", "dist"],
   overrides: [],
+  ignorePatterns: ["node_modules", "dist", "/src/gql.ts"],
   parser: "@typescript-eslint/parser",
   parserOptions: {
     ecmaVersion: "latest",

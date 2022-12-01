@@ -3,12 +3,6 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 async function main() {
-  await prisma.user.upsert({
-    where: { email: "john@doe.com" },
-    update: {},
-    create: { email: "john@doe.com" },
-  });
-
   await prisma.mission.upsert({
     where: { type_level: { type: "js", level: 1 } },
     update: {},

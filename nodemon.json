@@ -1,6 +1,6 @@
 {
   "$schema": "https://json.schemastore.org/nodemon.json",
-  "watch": ["src"],
+  "watch": ["src", ".env"],
   "ext": "ts,tsx",
-  "exec": "ts-node-esm --transpile-only ./src/index.ts"
+  "exec": "ts-node -r tsconfig-paths/register --transpile-only ./src/index.ts"
 }

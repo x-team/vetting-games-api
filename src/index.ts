@@ -1,44 +1,26 @@
 import { ApolloServer } from "@apollo/server";
-import { startStandaloneServer } from "@apollo/server/standalone";
-import { Resolvers } from "@generated/graphql.js";
-import { PrismaClient } from "@prisma/client";
+import { expressMiddleware } from "@apollo/server/express4";
+import { context, Context } from "@context";
+import { resolvers, typeDefs } from "@modules";
+import { json } from "body-parser";
+import cors from "cors";
+import express from "express";
 
-const prisma = new PrismaClient();
+(async function main() {
+  const app = express();
+  const server = new ApolloServer({
+    typeDefs: [typeDefs],
+    resolvers,
+  });
 
-const typeDefs = `#graphql
-  type Mission {
-    id: Int!
-    title: String!
-    description: String!
-    type: String!
-    level: Int!
-  }
+  app.use(cors({ origin: process.env.CLIENT_HOST || "*" }));
+  app.use(json());
 
-  type Query {
-    missions: [Mission!]!
-  }
-`;
+  await server.start();
 
-type Context = {
-  prisma: PrismaClient;
-};
+  app.use("/graphql", expressMiddleware<Context>(server, { context }));
 
-const resolvers: Resolvers<Context> = {
-  Query: {
-    missions: async (parent, args, context) => {
-      return context.prisma.mission.findMany();
-    },
-  },
-};
-
-const server = new ApolloServer({
-  typeDefs,
-  resolvers,
-});
-
-const { url } = await startStandaloneServer<Context>(server, {
-  listen: { port: 4000 },
-  context: async () => ({ prisma }),
-});
-
-console.log(`🚀 Server ready at ${url}`);
+  app.listen(4000, () => {
+    console.log(`🚀 Server ready at http://localhost:4000/graphql`);
+  });
+})();
