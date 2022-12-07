@@ -1,14 +1,9 @@
-FROM node:18
+FROM node:18-alpine
 
 WORKDIR /usr/src/app
 
-COPY package.json ./
-RUN yarn install
-
 COPY . .
-
+RUN yarn install
 RUN yarn build
-
-EXPOSE 4000
 
 CMD ["yarn", "start"]
