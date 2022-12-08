@@ -13,6 +13,7 @@ import express from "express";
     resolvers,
   });
 
+  app.use("/health", (req, res) => res.send("OK"));
   app.use(cors({ origin: process.env.CLIENT_HOST || "*" }));
   app.use(json());
 
