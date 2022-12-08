@@ -1,0 +1,36 @@
+version: 0.2
+
+env:
+  git-credential-helper: yes
+  parameter-store:
+    DOCKER_HUB_USER: '/devops/shared/DOCKER_HUB_USER'
+    DOCKER_HUB_PASSWORD: '/devops/shared/DOCKER_HUB_PASSWORD'
+
+phases:
+  install:
+    runtime-versions:
+      nodejs: 16
+    commands:
+      - n 18
+      - npm update -g npm
+      - aws --version
+      - node -v
+      - yarn -v
+      - yarn install --frozen-lockfile --production=false
+  pre_build:
+    commands:
+      - aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $REPOSITORY_URI
+      - IMAGE_TAG=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
+  build:
+    commands:
+      - echo $DOCKER_HUB_PASSWORD | docker login --username $DOCKER_HUB_USER --password-stdin
+      - docker build -t $REPOSITORY_URI:latest .
+      - docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAG
+  post_build:
+    commands:
+      - docker push $REPOSITORY_URI:latest
+      - docker push $REPOSITORY_URI:$IMAGE_TAG
+      - printf '[{"name":"%s","imageUri":"%s"}]' $CONTAINER_NAME $REPOSITORY_URI:$IMAGE_TAG > build.json
+artifacts:
+  files:
+    - build.json
