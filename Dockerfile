@@ -13,4 +13,4 @@ COPY . .
 RUN yarn db:generate
 RUN yarn build
 
-CMD eval $(aws-env) && yarn start
+CMD ["/bin/bash", "-c", "eval $(aws-env) && yarn start"]
