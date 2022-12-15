@@ -14,7 +14,7 @@ import express from "express";
   });
 
   app.use("/health", (req, res) => res.send("OK"));
-  app.use(cors({ origin: process.env.CLIENT_HOST || "*" }));
+  app.use(cors({ origin: process.env.CLIENT_HOST || "*", credentials: true }));
   app.use(json());
 
   await server.start();
