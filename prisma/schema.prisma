@@ -58,8 +58,9 @@ model Mission {
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
 
-  bugs  Bug[]
-  games Game[]
+  bugs       Bug[]
+  games      Game[]
+  sourceCode MissionSourceCode[]
 
   @@unique([type, level])
   @@index(fields: [active])
@@ -70,47 +71,53 @@ model Bug {
   id          Int     @id @default(autoincrement())
   name        String
   description String
-  realBug     Boolean
+  realBug     Boolean @default(true)
 
   missionId Int
-  mission   Mission @relation(fields: [missionId], references: [id], onDelete: Cascade)
+  mission   Mission     @relation(fields: [missionId], references: [id], onDelete: Cascade)
+  games     BugOnGame[]
 
   active    Boolean   @default(true)
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
-
-  bugOnGames BugOnGame[]
 
   @@index(fields: [active])
 }
 
+model MissionSourceCode {
+  id  String @id @default(uuid()) @db.Uuid
+  src String
+
+  missionId Int
+  mission   Mission @relation(fields: [missionId], references: [id], onDelete: Cascade)
+}
+
 model Game {
-  id         Int       @id @default(autoincrement())
-  score      Int?
+  id         String    @id @default(uuid()) @db.Uuid
+  score      Decimal?  @db.Decimal(5, 4)
   startedAt  DateTime  @default(now())
   finishedAt DateTime?
 
   missionId Int
-  mission   Mission @relation(fields: [missionId], references: [id], onDelete: Cascade)
-  userId    String  @db.Uuid
-  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  mission   Mission     @relation(fields: [missionId], references: [id], onDelete: Cascade)
+  userId    String      @db.Uuid
+  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bugs      BugOnGame[]
 
   active    Boolean   @default(true)
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
-
-  bugOnGames BugOnGame[]
 
   @@index(fields: [active])
 }
 
 model BugOnGame {
-  gameId Int
-  game   Game @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  gameId String @db.Uuid
+  game   Game   @relation(fields: [gameId], references: [id], onDelete: Cascade)
   bugId  Int
-  bug    Bug  @relation(fields: [bugId], references: [id], onDelete: Cascade)
+  bug    Bug    @relation(fields: [bugId], references: [id], onDelete: Cascade)
 
   @@id([gameId, bugId])
 }

@@ -5,23 +5,34 @@ import {
   GraphQLUnauthorizedError,
 } from "@error";
 import { Resolvers } from "@gql";
+import calculateGameScore from "./calculateScore";
 
 export const gameSchema = `#graphql
+  type BugOnGame {
+    bugId: Int!
+    gameId: ID!
+  }
+
   type Game {
-    id: Int!
-    score: Int
+    id: ID!
+    # Value between 0 and 1
+    score: Decimal
     startedAt: Date!
     finishedAt: Date
 
     mission: Mission
+    bugs: [BugOnGame!]
   }
 
   extend type Query {
-    game: Game
+    game(id: ID): Game
   }
 
   extend type Mutation {
     startGame(missionId: Int!): Game!
+    selectBug(gameId: ID!, bugId: Int!): Game!
+    unselectBug(gameId: ID!, bugId: Int!): Game!
+    finishGame(id: ID!): Game!
   }
 `;
 
@@ -38,16 +49,35 @@ export const gameResolver: Resolvers<Context> = {
 
       return mission;
     },
+    bugs: async (game, _, { prisma }) => {
+      const bugs = await prisma.game
+        .findUnique({
+          where: {
+            id: game.id,
+          },
+        })
+        .bugs();
+
+      return bugs;
+    },
   },
   Query: {
-    game: async (_, __, { prisma, user }) => {
+    game: async (_, { id }, { prisma, user }) => {
       if (!user) throw new GraphQLUnauthorizedError();
 
-      const game = await prisma.game.findFirst({
-        where: {
-          userId: user.id,
-          finishedAt: null,
-        },
+      if (!id) {
+        const game = await prisma.game.findFirst({
+          where: {
+            userId: user.id,
+            finishedAt: null,
+          },
+        });
+
+        return game;
+      }
+
+      const game = await prisma.game.findUnique({
+        where: { id },
       });
 
       return game;
@@ -68,6 +98,9 @@ export const gameResolver: Resolvers<Context> = {
           userId: user.id,
           finishedAt: null,
         },
+        select: {
+          id: true,
+        },
       });
 
       if (existingGame) throw new GraphQLAlreadyStartedError();
@@ -76,6 +109,75 @@ export const gameResolver: Resolvers<Context> = {
         data: {
           userId: user.id,
           missionId,
+        },
+      });
+
+      return game;
+    },
+    selectBug: async (_, { gameId, bugId }, { prisma, user }) => {
+      if (!user) throw new GraphQLUnauthorizedError();
+
+      const game = await prisma.bugOnGame
+        .create({
+          data: {
+            bugId,
+            gameId,
+          },
+        })
+        .game();
+
+      return game;
+    },
+    unselectBug: async (_, { gameId, bugId }, { prisma, user }) => {
+      if (!user) throw new GraphQLUnauthorizedError();
+
+      const game = await prisma.bugOnGame
+        .delete({
+          where: {
+            gameId_bugId: {
+              gameId,
+              bugId,
+            },
+          },
+        })
+        .game();
+
+      return game;
+    },
+    finishGame: async (_, { id }, { prisma, user }) => {
+      if (!user) throw new GraphQLUnauthorizedError();
+
+      const existingGame = await prisma.game.findUnique({
+        where: { id },
+        select: {
+          id: true,
+          bugs: {
+            select: {
+              bugId: true,
+            },
+          },
+          mission: {
+            select: {
+              bugs: {
+                select: {
+                  id: true,
+                  realBug: true,
+                },
+              },
+            },
+          },
+        },
+      });
+
+      if (!existingGame) throw new GraphQLNotFoundError("Game not found");
+
+      const game = await prisma.game.update({
+        where: {
+          id: existingGame.id,
+        },
+        data: {
+          finishedAt: new Date(),
+          score: calculateGameScore(existingGame),
         },
       });
 
