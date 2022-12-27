@@ -1,4 +1,5 @@
 import { Context } from "@context";
+import { GraphQLUnauthorizedError } from "@error";
 import { Resolvers } from "@gql";
 import githubLogin from "@modules/github/githubLogin";
 import githubUser from "@modules/github/githubUser";
@@ -6,8 +7,22 @@ import githubUserEmails from "@modules/github/githubUserEmails";
 import signUserToken from "./signUserToken";
 
 export const authSchema = `#graphql
+  type User {
+    id: ID!
+    name: String
+    alias: String
+    image: String
+
+    games(missionId: Int): [Game!]
+    scoreboards(missionId: Int): [Scoreboard!]
+  }
+
   type TokenResponse {
     access_token: String!
+  }
+
+  extend type Query {
+    me: User!
   }
 
   extend type Mutation {
@@ -16,6 +31,57 @@ export const authSchema = `#graphql
 `;
 
 export const authResolver: Resolvers<Context> = {
+  User: {
+    games: async (queryUser, { missionId }, { prisma, user }) => {
+      if (queryUser.id !== user?.id) throw new GraphQLUnauthorizedError();
+
+      const games = await prisma.user
+        .findUnique({
+          where: {
+            id: user.id,
+          },
+        })
+        .games({
+          where: {
+            missionId: missionId ? missionId : undefined,
+          },
+        });
+
+      return games;
+    },
+    scoreboards: async (queryUser, { missionId }, { prisma, user }) => {
+      if (queryUser.id !== user?.id) throw new GraphQLUnauthorizedError();
+
+      const scoreboards = await prisma.user
+        .findUnique({
+          where: {
+            id: user.id,
+          },
+        })
+        .scoreboards({
+          where: {
+            missionId: missionId ? missionId : undefined,
+          },
+        });
+
+      return scoreboards;
+    },
+  },
+  Query: {
+    me: async (_, __, { prisma, user }) => {
+      if (!user) throw new GraphQLUnauthorizedError();
+
+      const me = await prisma.user.findUnique({
+        where: {
+          id: user.id,
+        },
+      });
+
+      if (!me) throw new GraphQLUnauthorizedError();
+
+      return me;
+    },
+  },
   Mutation: {
     loginWithGitHub: async (_parent, { code, redirectUrl }, { prisma }) => {
       const githubLoginRes = await githubLogin(

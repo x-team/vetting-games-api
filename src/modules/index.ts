@@ -5,6 +5,7 @@ import { authResolver, authSchema } from "./auth";
 import { gameResolver, gameSchema } from "./game";
 import { dateResolver, dateSchema } from "./date";
 import { decimalResolver, decimalSchema } from "./decimal";
+import { scoreboardResolver, scoreboardSchema } from "./scoreboard";
 
 const baseSchema = `#graphql
   type Query {
@@ -38,6 +39,7 @@ export const typeDefs = [
   authSchema,
   missionSchema,
   gameSchema,
+  scoreboardSchema,
 ];
 export const resolvers = [
   baseResolver,
@@ -46,4 +48,5 @@ export const resolvers = [
   authResolver,
   missionResolver,
   gameResolver,
+  scoreboardResolver,
 ];

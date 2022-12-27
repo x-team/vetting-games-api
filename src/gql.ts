@@ -105,15 +105,23 @@ export type MutationUnselectBugArgs = {
 export type Query = {
   __typename?: "Query";
   game?: Maybe<Game>;
+  getScoreboardPosition: Scalars["Int"];
   health: Scalars["String"];
+  me: User;
   mission?: Maybe<Mission>;
   missionByTypeLevel?: Maybe<Mission>;
   missions: Array<Mission>;
   missionsByType: Array<Mission>;
+  scoreboard?: Maybe<Scoreboard>;
+  scoreboards: Array<Scoreboard>;
 };
 
 export type QueryGameArgs = {
   id?: InputMaybe<Scalars["ID"]>;
+};
+
+export type QueryGetScoreboardPositionArgs = {
+  missionId: Scalars["Int"];
 };
 
 export type QueryMissionArgs = {
@@ -129,9 +137,50 @@ export type QueryMissionsByTypeArgs = {
   type: Scalars["String"];
 };
 
+export type QueryScoreboardArgs = {
+  missionId: Scalars["Int"];
+};
+
+export type QueryScoreboardsArgs = {
+  missionId: Scalars["Int"];
+  pagination?: InputMaybe<ScoreboardPaginationInput>;
+};
+
+export type Scoreboard = {
+  __typename?: "Scoreboard";
+  game?: Maybe<Game>;
+  id: Scalars["ID"];
+  mission?: Maybe<Mission>;
+  score: Scalars["Int"];
+  user?: Maybe<User>;
+};
+
+export type ScoreboardPaginationInput = {
+  skip: Scalars["Int"];
+  take: Scalars["Int"];
+};
+
 export type TokenResponse = {
   __typename?: "TokenResponse";
   access_token: Scalars["String"];
+};
+
+export type User = {
+  __typename?: "User";
+  alias?: Maybe<Scalars["String"]>;
+  games?: Maybe<Array<Game>>;
+  id: Scalars["ID"];
+  image?: Maybe<Scalars["String"]>;
+  name?: Maybe<Scalars["String"]>;
+  scoreboards?: Maybe<Array<Scoreboard>>;
+};
+
+export type UserGamesArgs = {
+  missionId?: InputMaybe<Scalars["Int"]>;
+};
+
+export type UserScoreboardsArgs = {
+  missionId?: InputMaybe<Scalars["Int"]>;
 };
 
 export type ResolverTypeWrapper<T> = Promise<T> | T;
@@ -253,8 +302,11 @@ export type ResolversTypes = {
   MissionSourceCode: ResolverTypeWrapper<MissionSourceCode>;
   Mutation: ResolverTypeWrapper<{}>;
   Query: ResolverTypeWrapper<{}>;
+  Scoreboard: ResolverTypeWrapper<Scoreboard>;
+  ScoreboardPaginationInput: ScoreboardPaginationInput;
   String: ResolverTypeWrapper<Scalars["String"]>;
   TokenResponse: ResolverTypeWrapper<TokenResponse>;
+  User: ResolverTypeWrapper<User>;
 };
 
 /** Mapping between all available schema types and the resolvers parents */
@@ -271,8 +323,11 @@ export type ResolversParentTypes = {
   MissionSourceCode: MissionSourceCode;
   Mutation: {};
   Query: {};
+  Scoreboard: Scoreboard;
+  ScoreboardPaginationInput: ScoreboardPaginationInput;
   String: Scalars["String"];
   TokenResponse: TokenResponse;
+  User: User;
 };
 
 export type BugResolvers<
@@ -400,7 +455,14 @@ export type QueryResolvers<
     ContextType,
     Partial<QueryGameArgs>
   >;
+  getScoreboardPosition?: Resolver<
+    ResolversTypes["Int"],
+    ParentType,
+    ContextType,
+    RequireFields<QueryGetScoreboardPositionArgs, "missionId">
+  >;
   health?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
+  me?: Resolver<ResolversTypes["User"], ParentType, ContextType>;
   mission?: Resolver<
     Maybe<ResolversTypes["Mission"]>,
     ParentType,
@@ -424,6 +486,30 @@ export type QueryResolvers<
     ContextType,
     RequireFields<QueryMissionsByTypeArgs, "type">
   >;
+  scoreboard?: Resolver<
+    Maybe<ResolversTypes["Scoreboard"]>,
+    ParentType,
+    ContextType,
+    RequireFields<QueryScoreboardArgs, "missionId">
+  >;
+  scoreboards?: Resolver<
+    Array<ResolversTypes["Scoreboard"]>,
+    ParentType,
+    ContextType,
+    RequireFields<QueryScoreboardsArgs, "missionId">
+  >;
+};
+
+export type ScoreboardResolvers<
+  ContextType = any,
+  ParentType extends ResolversParentTypes["Scoreboard"] = ResolversParentTypes["Scoreboard"]
+> = {
+  game?: Resolver<Maybe<ResolversTypes["Game"]>, ParentType, ContextType>;
+  id?: Resolver<ResolversTypes["ID"], ParentType, ContextType>;
+  mission?: Resolver<Maybe<ResolversTypes["Mission"]>, ParentType, ContextType>;
+  score?: Resolver<ResolversTypes["Int"], ParentType, ContextType>;
+  user?: Resolver<Maybe<ResolversTypes["User"]>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type TokenResponseResolvers<
@@ -431,6 +517,29 @@ export type TokenResponseResolvers<
   ParentType extends ResolversParentTypes["TokenResponse"] = ResolversParentTypes["TokenResponse"]
 > = {
   access_token?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type UserResolvers<
+  ContextType = any,
+  ParentType extends ResolversParentTypes["User"] = ResolversParentTypes["User"]
+> = {
+  alias?: Resolver<Maybe<ResolversTypes["String"]>, ParentType, ContextType>;
+  games?: Resolver<
+    Maybe<Array<ResolversTypes["Game"]>>,
+    ParentType,
+    ContextType,
+    Partial<UserGamesArgs>
+  >;
+  id?: Resolver<ResolversTypes["ID"], ParentType, ContextType>;
+  image?: Resolver<Maybe<ResolversTypes["String"]>, ParentType, ContextType>;
+  name?: Resolver<Maybe<ResolversTypes["String"]>, ParentType, ContextType>;
+  scoreboards?: Resolver<
+    Maybe<Array<ResolversTypes["Scoreboard"]>>,
+    ParentType,
+    ContextType,
+    Partial<UserScoreboardsArgs>
+  >;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -444,5 +553,7 @@ export type Resolvers<ContextType = any> = {
   MissionSourceCode?: MissionSourceCodeResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
+  Scoreboard?: ScoreboardResolvers<ContextType>;
   TokenResponse?: TokenResponseResolvers<ContextType>;
+  User?: UserResolvers<ContextType>;
 };

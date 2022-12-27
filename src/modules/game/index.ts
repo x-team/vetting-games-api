@@ -151,11 +151,14 @@ export const gameResolver: Resolvers<Context> = {
         where: { id },
         select: {
           id: true,
+          startedAt: true,
+          userId: true,
           bugs: {
             select: {
               bugId: true,
             },
           },
+          missionId: true,
           mission: {
             select: {
               bugs: {
@@ -171,15 +174,35 @@ export const gameResolver: Resolvers<Context> = {
 
       if (!existingGame) throw new GraphQLNotFoundError("Game not found");
 
+      const score = calculateGameScore(existingGame);
+      const time = Math.floor(
+        (new Date().getTime() - existingGame.startedAt.getTime()) / 1000
+      );
+
       const game = await prisma.game.update({
-        where: {
-          id: existingGame.id,
-        },
-        data: {
-          finishedAt: new Date(),
-          score: calculateGameScore(existingGame),
-        },
+        where: { id: existingGame.id },
+        data: { finishedAt: new Date(), score },
       });
+
+      if (game.score?.toNumber() === 1) {
+        await prisma.scoreboard.upsert({
+          create: {
+            score: time,
+            gameId: existingGame.id,
+            missionId: existingGame.missionId,
+            userId: existingGame.userId,
+          },
+          update: {
+            score: time,
+          },
+          where: {
+            missionId_userId: {
+              missionId: existingGame.missionId,
+              userId: existingGame.userId,
+            },
+          },
+        });
+      }
 
       return game;
     },

@@ -22,6 +22,7 @@ model User {
 
   games       Game[]
   SocialLogin SocialLogin[]
+  scoreboards Scoreboard[]
 
   @@index(fields: [active])
 }
@@ -61,6 +62,7 @@ model Mission {
   bugs       Bug[]
   games      Game[]
   sourceCode MissionSourceCode[]
+  Scoreboard Scoreboard[]
 
   @@unique([type, level])
   @@index(fields: [active])
@@ -99,11 +101,12 @@ model Game {
   startedAt  DateTime  @default(now())
   finishedAt DateTime?
 
-  missionId Int
-  mission   Mission     @relation(fields: [missionId], references: [id], onDelete: Cascade)
-  userId    String      @db.Uuid
-  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  bugs      BugOnGame[]
+  missionId  Int
+  mission    Mission     @relation(fields: [missionId], references: [id], onDelete: Cascade)
+  userId     String      @db.Uuid
+  user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bugs       BugOnGame[]
+  scoreboard Scoreboard?
 
   active    Boolean   @default(true)
   createdAt DateTime  @default(now())
@@ -120,4 +123,25 @@ model BugOnGame {
   bug    Bug    @relation(fields: [bugId], references: [id], onDelete: Cascade)
 
   @@id([gameId, bugId])
+}
+
+model Scoreboard {
+  id    String @id @default(uuid()) @db.Uuid
+  score Int
+
+  gameId    String  @unique @db.Uuid
+  game      Game    @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  userId    String  @db.Uuid
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  missionId Int
+  mission   Mission @relation(fields: [missionId], references: [id], onDelete: Cascade)
+
+  active    Boolean   @default(true)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@unique([missionId, userId])
+  @@index(fields: [active, missionId])
+  @@index(fields: [active])
 }
