@@ -15,6 +15,7 @@ export const authSchema = `#graphql
 
     games(missionId: Int): [Game!]
     scoreboards(missionId: Int): [Scoreboard!]
+    settings: Settings
   }
 
   type TokenResponse {
@@ -65,6 +66,36 @@ export const authResolver: Resolvers<Context> = {
         });
 
       return scoreboards;
+    },
+    settings: async (queryUser, _, { prisma, user }) => {
+      if (queryUser.id !== user?.id) throw new GraphQLUnauthorizedError();
+
+      let settings = await prisma.settings.findUnique({
+        where: {
+          id: user.id,
+        },
+        include: {
+          gameSettings: true,
+        },
+      });
+
+      if (!settings) {
+        settings = await prisma.settings.create({
+          data: {
+            id: user.id,
+            gameSettings: {
+              create: {
+                showTutorial: true,
+              },
+            },
+          },
+          include: {
+            gameSettings: true,
+          },
+        });
+      }
+
+      return settings;
     },
   },
   Query: {

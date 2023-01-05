@@ -51,6 +51,15 @@ export type Game = {
   startedAt: Scalars["Date"];
 };
 
+export type GameSettings = {
+  __typename?: "GameSettings";
+  showTutorial: Scalars["Boolean"];
+};
+
+export type GameSettingsInput = {
+  showTutorial: Scalars["Boolean"];
+};
+
 export type Mission = {
   __typename?: "Mission";
   bugs?: Maybe<Array<Bug>>;
@@ -77,6 +86,7 @@ export type Mutation = {
   selectBug: Game;
   startGame: Game;
   unselectBug: Game;
+  updateSettings: Settings;
 };
 
 export type MutationFinishGameArgs = {
@@ -100,6 +110,10 @@ export type MutationStartGameArgs = {
 export type MutationUnselectBugArgs = {
   bugId: Scalars["Int"];
   gameId: Scalars["ID"];
+};
+
+export type MutationUpdateSettingsArgs = {
+  settings: SettingsInput;
 };
 
 export type Query = {
@@ -160,6 +174,16 @@ export type ScoreboardPaginationInput = {
   take: Scalars["Int"];
 };
 
+export type Settings = {
+  __typename?: "Settings";
+  gameSettings?: Maybe<GameSettings>;
+  id: Scalars["ID"];
+};
+
+export type SettingsInput = {
+  gameSettings?: InputMaybe<GameSettingsInput>;
+};
+
 export type TokenResponse = {
   __typename?: "TokenResponse";
   access_token: Scalars["String"];
@@ -173,6 +197,7 @@ export type User = {
   image?: Maybe<Scalars["String"]>;
   name?: Maybe<Scalars["String"]>;
   scoreboards?: Maybe<Array<Scoreboard>>;
+  settings?: Maybe<Settings>;
 };
 
 export type UserGamesArgs = {
@@ -296,6 +321,8 @@ export type ResolversTypes = {
   Date: ResolverTypeWrapper<Scalars["Date"]>;
   Decimal: ResolverTypeWrapper<Scalars["Decimal"]>;
   Game: ResolverTypeWrapper<Game>;
+  GameSettings: ResolverTypeWrapper<GameSettings>;
+  GameSettingsInput: GameSettingsInput;
   ID: ResolverTypeWrapper<Scalars["ID"]>;
   Int: ResolverTypeWrapper<Scalars["Int"]>;
   Mission: ResolverTypeWrapper<Mission>;
@@ -304,6 +331,8 @@ export type ResolversTypes = {
   Query: ResolverTypeWrapper<{}>;
   Scoreboard: ResolverTypeWrapper<Scoreboard>;
   ScoreboardPaginationInput: ScoreboardPaginationInput;
+  Settings: ResolverTypeWrapper<Settings>;
+  SettingsInput: SettingsInput;
   String: ResolverTypeWrapper<Scalars["String"]>;
   TokenResponse: ResolverTypeWrapper<TokenResponse>;
   User: ResolverTypeWrapper<User>;
@@ -317,6 +346,8 @@ export type ResolversParentTypes = {
   Date: Scalars["Date"];
   Decimal: Scalars["Decimal"];
   Game: Game;
+  GameSettings: GameSettings;
+  GameSettingsInput: GameSettingsInput;
   ID: Scalars["ID"];
   Int: Scalars["Int"];
   Mission: Mission;
@@ -325,6 +356,8 @@ export type ResolversParentTypes = {
   Query: {};
   Scoreboard: Scoreboard;
   ScoreboardPaginationInput: ScoreboardPaginationInput;
+  Settings: Settings;
+  SettingsInput: SettingsInput;
   String: Scalars["String"];
   TokenResponse: TokenResponse;
   User: User;
@@ -373,6 +406,14 @@ export type GameResolvers<
   mission?: Resolver<Maybe<ResolversTypes["Mission"]>, ParentType, ContextType>;
   score?: Resolver<Maybe<ResolversTypes["Decimal"]>, ParentType, ContextType>;
   startedAt?: Resolver<ResolversTypes["Date"], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type GameSettingsResolvers<
+  ContextType = any,
+  ParentType extends ResolversParentTypes["GameSettings"] = ResolversParentTypes["GameSettings"]
+> = {
+  showTutorial?: Resolver<ResolversTypes["Boolean"], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -443,6 +484,12 @@ export type MutationResolvers<
     ContextType,
     RequireFields<MutationUnselectBugArgs, "bugId" | "gameId">
   >;
+  updateSettings?: Resolver<
+    ResolversTypes["Settings"],
+    ParentType,
+    ContextType,
+    RequireFields<MutationUpdateSettingsArgs, "settings">
+  >;
 };
 
 export type QueryResolvers<
@@ -512,6 +559,19 @@ export type ScoreboardResolvers<
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
+export type SettingsResolvers<
+  ContextType = any,
+  ParentType extends ResolversParentTypes["Settings"] = ResolversParentTypes["Settings"]
+> = {
+  gameSettings?: Resolver<
+    Maybe<ResolversTypes["GameSettings"]>,
+    ParentType,
+    ContextType
+  >;
+  id?: Resolver<ResolversTypes["ID"], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
 export type TokenResponseResolvers<
   ContextType = any,
   ParentType extends ResolversParentTypes["TokenResponse"] = ResolversParentTypes["TokenResponse"]
@@ -540,6 +600,11 @@ export type UserResolvers<
     ContextType,
     Partial<UserScoreboardsArgs>
   >;
+  settings?: Resolver<
+    Maybe<ResolversTypes["Settings"]>,
+    ParentType,
+    ContextType
+  >;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -549,11 +614,13 @@ export type Resolvers<ContextType = any> = {
   Date?: GraphQLScalarType;
   Decimal?: GraphQLScalarType;
   Game?: GameResolvers<ContextType>;
+  GameSettings?: GameSettingsResolvers<ContextType>;
   Mission?: MissionResolvers<ContextType>;
   MissionSourceCode?: MissionSourceCodeResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
   Scoreboard?: ScoreboardResolvers<ContextType>;
+  Settings?: SettingsResolvers<ContextType>;
   TokenResponse?: TokenResponseResolvers<ContextType>;
   User?: UserResolvers<ContextType>;
 };
