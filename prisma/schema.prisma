@@ -74,40 +74,75 @@ model Mission {
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
 
-  bugs       Bug[]
-  games      Game[]
-  sourceCode MissionSourceCode[]
-  Scoreboard Scoreboard[]
+  games        Game[]
+  scoreboards  Scoreboard[]
+  missionFiles MissionFile[]
+  bugs         Bug[]
+  bugTypes     BugType[]
 
   @@unique([type, level])
   @@index(fields: [active])
   @@index(fields: [active, type])
 }
 
-model Bug {
-  id          Int     @id @default(autoincrement())
-  name        String
-  description String
-  realBug     Boolean @default(true)
-
-  missionId Int
-  mission   Mission     @relation(fields: [missionId], references: [id], onDelete: Cascade)
-  games     BugOnGame[]
-
-  active    Boolean   @default(true)
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  deletedAt DateTime?
-
-  @@index(fields: [active])
-}
-
-model MissionSourceCode {
-  id  String @id @default(uuid()) @db.Uuid
-  src String
-
+model MissionFile {
   missionId Int
   mission   Mission @relation(fields: [missionId], references: [id], onDelete: Cascade)
+  fileId    String  @unique @db.Uuid
+  file      File    @relation(fields: [fileId], references: [id], onDelete: Cascade)
+
+  @@id([missionId, fileId])
+}
+
+model BugType {
+  id          Int    @id @default(autoincrement())
+  name        String @unique
+  description String
+
+  bugs       Bug[]
+  pickedBugs PickedBug[]
+  gameBugs   GameBug[]
+  missions   Mission[]
+}
+
+model Bug {
+  id   Int    @id @default(autoincrement())
+  name String
+
+  bugTypeId Int
+  bugType   BugType   @relation(fields: [bugTypeId], references: [id], onDelete: Cascade)
+  missionId Int
+  mission   Mission   @relation(fields: [missionId], references: [id], onDelete: Cascade)
+  fileId    String    @db.Uuid
+  file      File      @relation(fields: [fileId], references: [id], onDelete: Cascade)
+  gameBugs  GameBug[]
+  bugFiles  BugFile[]
+
+  @@unique([missionId, bugTypeId, name])
+  @@index([missionId])
+  @@index([missionId, bugTypeId])
+}
+
+model BugFile {
+  bugId  Int
+  bug    Bug    @relation(fields: [bugId], references: [id], onDelete: Cascade)
+  fileId String @unique @db.Uuid
+  file   File   @relation(fields: [fileId], references: [id], onDelete: Cascade)
+
+  lineStart Int
+  lineEnd   Int
+
+  @@id([bugId, fileId])
+}
+
+model File {
+  id   String @id @default(uuid()) @db.Uuid
+  name String
+  path String @unique
+
+  bugs        Bug[]
+  missionFile MissionFile?
+  bugFile     BugFile?
 }
 
 model Game {
@@ -120,8 +155,9 @@ model Game {
   mission    Mission     @relation(fields: [missionId], references: [id], onDelete: Cascade)
   userId     String      @db.Uuid
   user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  bugs       BugOnGame[]
   scoreboard Scoreboard?
+  pickedBugs PickedBug[]
+  bugs       GameBug[]
 
   active    Boolean   @default(true)
   createdAt DateTime  @default(now())
@@ -131,13 +167,24 @@ model Game {
   @@index(fields: [active])
 }
 
-model BugOnGame {
-  gameId String @db.Uuid
-  game   Game   @relation(fields: [gameId], references: [id], onDelete: Cascade)
-  bugId  Int
-  bug    Bug    @relation(fields: [bugId], references: [id], onDelete: Cascade)
+model PickedBug {
+  gameId    String  @db.Uuid
+  game      Game    @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  bugTypeId Int
+  bugType   BugType @relation(fields: [bugTypeId], references: [id], onDelete: Cascade)
 
-  @@id([gameId, bugId])
+  @@id([gameId, bugTypeId])
+}
+
+model GameBug {
+  gameId    String  @db.Uuid
+  game      Game    @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  bugTypeId Int
+  bugType   BugType @relation(fields: [bugTypeId], references: [id], onDelete: Cascade)
+  bugId     Int
+  bug       Bug     @relation(fields: [bugId], references: [id], onDelete: Cascade)
+
+  @@id([gameId, bugTypeId])
 }
 
 model Scoreboard {

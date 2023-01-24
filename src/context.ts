@@ -1,6 +1,7 @@
 import type { ContextFunction } from "@apollo/server";
 import { ExpressContextFunctionArgument } from "@apollo/server/dist/esm/express4";
 import verifyUserToken from "@modules/auth/verifyUserToken";
+import { prisma } from "@prisma";
 import { PrismaClient, User } from "@prisma/client";
 
 export type TokenUser = Pick<User, "id" | "email" | "name">;
@@ -9,8 +10,6 @@ export type Context = {
   prisma: PrismaClient;
   user?: TokenUser | null;
 };
-
-const prisma = new PrismaClient();
 
 export const context: ContextFunction<
   [ExpressContextFunctionArgument],

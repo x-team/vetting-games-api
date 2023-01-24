@@ -1,5 +1,5 @@
 import { Context } from "@context";
-import { GraphQLNotFoundError, GraphQLUnauthorizedError } from "@error";
+import { GraphQLUnauthorizedError } from "@error";
 import { Resolvers } from "@gql";
 
 export const scoreboardSchema = `#graphql
@@ -96,7 +96,7 @@ export const scoreboardResolver: Resolvers<Context> = {
       if (!user) throw new GraphQLUnauthorizedError();
 
       type PositionRow = {
-        position: BigInt;
+        position: bigint;
       };
 
       const response = await prisma.$queryRaw<PositionRow[] | undefined>`
