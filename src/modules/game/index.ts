@@ -147,6 +147,7 @@ export const gameResolver: Resolvers<Context> = {
       if (existingGame) throw new GraphQLAlreadyStartedError();
 
       const gameBugs: (Bug & { bugFiles: BugFile[] })[] = [];
+      const maxBug = Math.random() < 0.5 ? 1 : 2;
 
       do {
         const randomIndex = Math.floor(Math.random() * mission.bugs.length);
@@ -170,7 +171,7 @@ export const gameResolver: Resolvers<Context> = {
         if (!alreadyExistBugType && !overrideLines) {
           gameBugs.push(bug);
         }
-      } while (gameBugs.length < 2);
+      } while (gameBugs.length < maxBug);
 
       const game = await prisma.game.create({
         data: {
