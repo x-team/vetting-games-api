@@ -21,6 +21,7 @@ export const settingsSchema = `#graphql
   }
 
   extend type Mutation {
+    "Update the settings of the user"
     updateSettings(settings: SettingsInput!): Settings!
   }
 `;

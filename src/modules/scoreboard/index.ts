@@ -18,8 +18,11 @@ export const scoreboardSchema = `#graphql
   }
 
   extend type Query {
+    "Get a scoreboard by mission id"
     scoreboard(missionId: Int!): Scoreboard
+    "Get all scoreboards by mission id"
     scoreboards(missionId: Int!, pagination: ScoreboardPaginationInput): [Scoreboard!]!
+    "Get the scoreboard position of the user"
     getScoreboardPosition(missionId: Int!): Int!
   }
 `;

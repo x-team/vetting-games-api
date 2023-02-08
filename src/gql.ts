@@ -48,6 +48,7 @@ export type Game = {
   id: Scalars["ID"];
   mission?: Maybe<Mission>;
   pickedBugs?: Maybe<Array<GameBug>>;
+  /** Score value between 0 and 1 */
   score?: Maybe<Scalars["Decimal"]>;
   startedAt: Scalars["Date"];
 };
@@ -82,12 +83,22 @@ export type Mission = {
 
 export type Mutation = {
   __typename?: "Mutation";
+  /** Player finishes a game */
   finishGame: Game;
   health: Scalars["String"];
+  /**
+   * Login with GitHub
+   *
+   * Requires the code from the GitHub OAuth flow and the redirect URL
+   */
   loginWithGitHub: TokenResponse;
+  /** Player selects a bug type for a game */
   selectBug: Game;
+  /** Player starts a game */
   startGame: Game;
+  /** Player unselects a bug type for a game */
   unselectBug: Game;
+  /** Update the settings of the user */
   updateSettings: Settings;
 };
 
@@ -120,16 +131,22 @@ export type MutationUpdateSettingsArgs = {
 
 export type Query = {
   __typename?: "Query";
+  /** Get a game by id */
   game?: Maybe<Game>;
+  /** Get all files for a game (including bugs) */
   gameFiles: Array<File>;
+  /** Get the scoreboard position of the user */
   getScoreboardPosition: Scalars["Int"];
   health: Scalars["String"];
+  /** Get the current user */
   me: User;
   mission?: Maybe<Mission>;
   missionByTypeLevel?: Maybe<Mission>;
   missions: Array<Mission>;
   missionsByType: Array<Mission>;
+  /** Get a scoreboard by mission id */
   scoreboard?: Maybe<Scoreboard>;
+  /** Get all scoreboards by mission id */
   scoreboards: Array<Scoreboard>;
 };
 
@@ -191,6 +208,7 @@ export type SettingsInput = {
   gameSettings?: InputMaybe<GameSettingsInput>;
 };
 
+/** Response from GitHub login */
 export type TokenResponse = {
   __typename?: "TokenResponse";
   access_token: Scalars["String"];

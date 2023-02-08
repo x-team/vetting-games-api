@@ -12,6 +12,7 @@ export const fileSchema = `#graphql
   }
 
   extend type Query {
+    "Get all files for a game (including bugs)"
     gameFiles(gameId: ID!): [File!]!
   }
 `;

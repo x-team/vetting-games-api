@@ -15,9 +15,13 @@ export const missionSchema = `#graphql
   }
 
   type Query {
+    # Get all missions
     missions: [Mission!]!
+    # Get a mission by id
     mission(id: Int!): Mission
+    # Get a mission by type and level
     missionByTypeLevel(type: String!, level: Int!): Mission
+    # Get all missions by type
     missionsByType(type: String!): [Mission!]!
   }
 `;
