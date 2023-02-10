@@ -1,0 +1,2 @@
+    timeTracking.tracking("active");
+    awayDebounced();

@@ -2,6 +2,7 @@ import { TokenUser } from "@context";
 import { User } from "@prisma/client";
 import jwt from "jsonwebtoken";
 
+/** Sign a user token using JWT with the user's id, email and name. */
 export default function signUserToken(user: User) {
   return jwt.sign(
     {

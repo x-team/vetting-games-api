@@ -1,5 +1,5 @@
 import { Context } from "@context";
-import { GraphQLNotFoundError, GraphQLUnauthorizedError } from "@error";
+import { GraphQLUnauthorizedError } from "@error";
 import { Resolvers } from "@gql";
 
 export const settingsSchema = `#graphql
@@ -21,6 +21,7 @@ export const settingsSchema = `#graphql
   }
 
   extend type Mutation {
+    "Update the settings of the user"
     updateSettings(settings: SettingsInput!): Settings!
   }
 `;

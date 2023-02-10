@@ -1,16 +1,3 @@
-type PartialGame = {
-  id: string;
-  mission: {
-    bugs: {
-      id: number;
-      realBug: boolean;
-    }[];
-  };
-  bugs: {
-    bugId: number;
-  }[];
-};
-
 /**
  * Calculates the score of a game based on the bugs selected by the user saved in BugOnGame.
  * Takes the total number of bugs in the mission and the number of bugs selected by the user
@@ -23,27 +10,30 @@ type PartialGame = {
  * @param game
  * @returns `score` Number between `0` and `1` where `1` is the best score.
  */
-export default function calculateGameScore(game: PartialGame): number {
-  const realBugList =
-    game.mission.bugs?.filter((bug) => bug.realBug).map((bug) => bug.id) || [];
-  const realBugs = realBugList.length;
+export default function calculateGameScore(
+  bugs: number[],
+  picked: number[]
+): number {
+  const totalBugs = bugs.length;
 
-  if (realBugs === 0) {
-    return 1;
-  }
+  if (totalBugs === 0) return 1;
 
-  const selectedBugs = game.bugs?.map((bug) => bug.bugId) || [];
+  const { correct, wrong } = bugs.reduce(
+    (acc, bug) => {
+      const isCorrect = picked.includes(bug);
 
-  const correctBugs = selectedBugs.filter((bug) =>
-    realBugList.includes(bug)
-  ).length;
-  const wrongBugs = selectedBugs.filter(
-    (bug) => !realBugList.includes(bug)
-  ).length;
+      return {
+        ...acc,
+        correct: acc.correct + (isCorrect ? 1 : 0),
+        wrong: acc.wrong + (isCorrect ? 0 : 1),
+      };
+    },
+    { correct: 0, wrong: 0 }
+  );
 
-  if (correctBugs - wrongBugs < 0) {
+  if (correct - wrong < 0) {
     return 0;
   }
 
-  return (correctBugs - wrongBugs) / realBugs;
+  return (correct - wrong) / totalBugs;
 }

@@ -3,17 +3,6 @@ import { GraphQLUnauthorizedError } from "@error";
 import { Resolvers } from "@gql";
 
 export const missionSchema = `#graphql
-  type MissionSourceCode {
-    id: String!
-    src: String!
-  }
-
-  type Bug {
-    id: Int!
-    name: String!
-    description: String!
-  }
-
   type Mission {
     id: Int!
     title: String!
@@ -22,41 +11,25 @@ export const missionSchema = `#graphql
     level: Int!
     releaseDate: Date
 
-    bugs: [Bug!]
-    sourceCode: [MissionSourceCode!]
+    bugTypes: [BugType!]
   }
 
   type Query {
+    # Get all missions
     missions: [Mission!]!
+    # Get a mission by id
     mission(id: Int!): Mission
+    # Get a mission by type and level
     missionByTypeLevel(type: String!, level: Int!): Mission
+    # Get all missions by type
     missionsByType(type: String!): [Mission!]!
   }
 `;
 
 export const missionResolver: Resolvers<Context> = {
   Mission: {
-    sourceCode: async (mission, _, { prisma }) => {
-      const sourceCode = await prisma.mission
-        .findUnique({
-          where: {
-            id: mission.id,
-          },
-        })
-        .sourceCode();
-
-      return sourceCode;
-    },
-    bugs: async (mission, _, { prisma }) => {
-      const bugs = await prisma.mission
-        .findUnique({
-          where: {
-            id: mission.id,
-          },
-        })
-        .bugs();
-
-      return bugs;
+    bugTypes: async ({ id }, _, { prisma }) => {
+      return prisma.mission.findUnique({ where: { id } }).bugTypes();
     },
   },
   Query: {
