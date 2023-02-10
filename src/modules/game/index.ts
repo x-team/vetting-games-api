@@ -19,7 +19,7 @@ export const gameSchema = `#graphql
 
   type Game {
     id: ID!
-    # Value between 0 and 1
+    "Score value between 0 and 1"
     score: Decimal
     startedAt: Date!
     finishedAt: Date
@@ -29,13 +29,18 @@ export const gameSchema = `#graphql
   }
 
   extend type Query {
+    "Get a game by id"
     game(id: ID): Game
   }
 
   extend type Mutation {
+    "Player starts a game"
     startGame(missionId: Int!): Game!
+    "Player selects a bug type for a game"
     selectBug(gameId: ID!, bugTypeId: Int!): Game!
+    "Player unselects a bug type for a game"
     unselectBug(gameId: ID!, bugTypeId: Int!): Game!
+    "Player finishes a game"
     finishGame(id: ID!): Game!
   }
 `;

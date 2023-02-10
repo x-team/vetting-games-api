@@ -18,15 +18,22 @@ export const authSchema = `#graphql
     settings: Settings
   }
 
+  "Response from GitHub login"
   type TokenResponse {
     access_token: String!
   }
 
   extend type Query {
+    "Get the current user"
     me: User!
   }
 
   extend type Mutation {
+    """
+    Login with GitHub
+
+    Requires the code from the GitHub OAuth flow and the redirect URL
+    """
     loginWithGitHub(code: String!, redirectUrl: String): TokenResponse!
   }
 `;

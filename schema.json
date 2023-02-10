@@ -223,7 +223,7 @@
           },
           {
             "name": "score",
-            "description": null,
+            "description": "Score value between 0 and 1",
             "args": [],
             "type": {
               "kind": "SCALAR",
@@ -526,7 +526,7 @@
         "fields": [
           {
             "name": "finishGame",
-            "description": null,
+            "description": "Player finishes a game",
             "args": [
               {
                 "name": "id",
@@ -575,7 +575,7 @@
           },
           {
             "name": "loginWithGitHub",
-            "description": null,
+            "description": "Login with GitHub\n\nRequires the code from the GitHub OAuth flow and the redirect URL",
             "args": [
               {
                 "name": "code",
@@ -620,7 +620,7 @@
           },
           {
             "name": "selectBug",
-            "description": null,
+            "description": "Player selects a bug type for a game",
             "args": [
               {
                 "name": "bugTypeId",
@@ -669,7 +669,7 @@
           },
           {
             "name": "startGame",
-            "description": null,
+            "description": "Player starts a game",
             "args": [
               {
                 "name": "missionId",
@@ -702,7 +702,7 @@
           },
           {
             "name": "unselectBug",
-            "description": null,
+            "description": "Player unselects a bug type for a game",
             "args": [
               {
                 "name": "bugTypeId",
@@ -751,7 +751,7 @@
           },
           {
             "name": "updateSettings",
-            "description": null,
+            "description": "Update the settings of the user",
             "args": [
               {
                 "name": "settings",
@@ -795,7 +795,7 @@
         "fields": [
           {
             "name": "game",
-            "description": null,
+            "description": "Get a game by id",
             "args": [
               {
                 "name": "id",
@@ -820,7 +820,7 @@
           },
           {
             "name": "gameFiles",
-            "description": null,
+            "description": "Get all files for a game (including bugs)",
             "args": [
               {
                 "name": "gameId",
@@ -861,7 +861,7 @@
           },
           {
             "name": "getScoreboardPosition",
-            "description": null,
+            "description": "Get the scoreboard position of the user",
             "args": [
               {
                 "name": "missionId",
@@ -910,7 +910,7 @@
           },
           {
             "name": "me",
-            "description": null,
+            "description": "Get the current user",
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -1065,7 +1065,7 @@
           },
           {
             "name": "scoreboard",
-            "description": null,
+            "description": "Get a scoreboard by mission id",
             "args": [
               {
                 "name": "missionId",
@@ -1094,7 +1094,7 @@
           },
           {
             "name": "scoreboards",
-            "description": null,
+            "description": "Get all scoreboards by mission id",
             "args": [
               {
                 "name": "missionId",
@@ -1348,7 +1348,7 @@
       {
         "kind": "OBJECT",
         "name": "TokenResponse",
-        "description": null,
+        "description": "Response from GitHub login",
         "fields": [
           {
             "name": "access_token",
